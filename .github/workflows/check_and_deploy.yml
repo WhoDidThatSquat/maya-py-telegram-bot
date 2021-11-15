@@ -9,11 +9,15 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+    - name : Setting up SSH
+      run: |
+        apt-get update -qq
+        apt-get install -qq git
+        'which ssh-agent || ( apt-get install -qq openssh-client )'
+        eval $(ssh-agent -s)
+        ssh-add <(echo '${{ secrets.SSH }}')
+        mkdir -p ~/.ssh
+        '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
     - name: Update on server
       run: |
-        echo '${{ secrets.SSH }}' > /dev/tmp/id_rsa
-        chmod 600 /dev/tmp/id_rsa
-        ssh -i "aws-telegram-bot.pem" ubuntu@ec2-18-196-110-178.eu-central-1.compute.amazonaws.com "cd /home/ubuntu/maya-py-telegram-bot/telegrambot.py && git pull && systemctl restart mayabot.service && exit"        
-    - name: Cleaning
-      run: |
-        rm -r /dev/tmp/id_rsa
+        ssh -i "aws-telegram-bot.pem" ubuntu@ec2-18-196-110-178.eu-central-1.compute.amazonaws.com "cd /home/ubuntu/maya-py-telegram-bot/telegrambot.py && git pull && systemctl restart mayabot.service && exit"
