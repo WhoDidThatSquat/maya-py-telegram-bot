@@ -20,4 +20,4 @@ jobs:
           
         host: ${{ secrets.HOST }}
         user: ubuntu
-        key: ${{ secrets.SSH}}
+        key: ${{ secrets.SSH }}
