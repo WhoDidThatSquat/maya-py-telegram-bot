@@ -9,12 +9,15 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name : Setting up SSH
-      run: |
-        eval $(ssh-agent -s)
-        ssh-add <(echo '${{ secrets.SSH }}')
-        mkdir -p ~/.ssh
-        '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
-    - name: Update on server
-      run: |
-        ssh -i "aws-telegram-bot.pem" ubuntu@ec2-18-196-110-178.eu-central-1.compute.amazonaws.com "cd /home/ubuntu/maya-py-telegram-bot/telegrambot.py && git pull && systemctl restart mayabot.service && exit"
+    
+    - name: Lazy deploy
+      uses: fifsky/ssh-action@master
+      with:
+        command: |
+          cd /home/ubuntu/maya-py-telegram-bot/telegrambot.py 
+          git pull
+          sudo systemctl restart mayabot.service
+          
+        host: ${{ secrets.HOST }}
+        user: ubuntu
+        key: ${{ secrets.SSH}}
