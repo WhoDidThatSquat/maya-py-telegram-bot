@@ -1,26 +1,24 @@
-name: Pylint
+name: deploy
 
-on: [push]
+on: 
+  push:
+    branches:
+    - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.8", "3.9", "3.10"]
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
+    - name: Update on server
       run: |
-        python -m pip install --upgrade pip
-        pip install pylint
-        pip install python-telegram-bot
-        pip install beautifulsoup4
-    - name: Analysing the code with pylint
+        echo '${{ secrets.SSH }}' > /dev/tmp/id_rsa
+        chmod 600 /dev/tmp/id_rsa
+        ssh -i "aws-telegram-bot.pem" ubuntu@ec2-18-196-110-178.eu-central-1.compute.amazonaws.com
+        cd /home/ubuntu/maya-py-telegram-bot/telegrambot.py
+        git pull
+        sudo systemctl restart mayabot.service
+        exit
+        
+    - name: Cleaning
       run: |
-        echo 'def prod():return "${{ secrets.TELEGRAM_API_KEY }}"' > api_key.py
-        pylint `ls -R|grep .py$|xargs`
+        rm -r /dev/tmp/id_rsa
