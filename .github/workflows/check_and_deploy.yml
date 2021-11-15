@@ -13,12 +13,7 @@ jobs:
       run: |
         echo '${{ secrets.SSH }}' > /dev/tmp/id_rsa
         chmod 600 /dev/tmp/id_rsa
-        ssh -i "aws-telegram-bot.pem" ubuntu@ec2-18-196-110-178.eu-central-1.compute.amazonaws.com
-        cd /home/ubuntu/maya-py-telegram-bot/telegrambot.py
-        git pull
-        sudo systemctl restart mayabot.service
-        exit
-        
+        ssh -i "aws-telegram-bot.pem" ubuntu@ec2-18-196-110-178.eu-central-1.compute.amazonaws.com "cd /home/ubuntu/maya-py-telegram-bot/telegrambot.py && git pull && systemctl restart mayabot.service && exit"        
     - name: Cleaning
       run: |
         rm -r /dev/tmp/id_rsa
