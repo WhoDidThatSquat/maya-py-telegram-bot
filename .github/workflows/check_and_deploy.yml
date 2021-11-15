@@ -11,9 +11,6 @@ jobs:
     steps:
     - name : Setting up SSH
       run: |
-        apt-get update -qq
-        apt-get install -qq git
-        'which ssh-agent || ( apt-get install -qq openssh-client )'
         eval $(ssh-agent -s)
         ssh-add <(echo '${{ secrets.SSH }}')
         mkdir -p ~/.ssh
