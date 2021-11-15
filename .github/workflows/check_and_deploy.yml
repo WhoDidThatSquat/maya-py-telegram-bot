@@ -20,5 +20,5 @@ jobs:
         pip install pylint
     - name: Analysing the code with pylint
       run: |
-        echo 'def prod():return "${{ TELEGRAM_API_KEY }}"' > api_key.py
+        echo 'def prod():return "${{ secrets.TELEGRAM_API_KEY }}"' > api_key.py
         pylint `ls -R|grep .py$|xargs`
