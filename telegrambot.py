@@ -4,9 +4,10 @@ import requests
 import json
 import get_covid_city_stats as gccs
 import api_key
+import call_openai
 from datetime import datetime
 from random import randrange
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from telegram.ext import Updater, CommandHandler, MessageHandler, filters
 from telegram import InputMediaPhoto
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -44,6 +45,16 @@ def covid_city_stats(update, context):
             update.message.from_user.last_name, city
             )
 
+def openai_jokes(update, context):
+    global reply
+    #if(reply == True):
+    try:
+        aux = update.message.text
+        text = aux.split(' ',1)[1]
+        completion = call_openai.req_openai(text)
+        update.message.reply_text(completion)
+    finally:
+        print("TODO:To add logging")
 
 def log_action(chat_id, title, chat_type, user_id , username, first_name, last_name, city):
     n0w = datetime.now()
@@ -71,6 +82,7 @@ def main():
     updater = Updater(api_key.prod(), use_context=True)
 
     updater.dispatcher.add_handler(CommandHandler('city', covid_city_stats))
+    updater.dispatcher.add_handler(CommandHandler('openai', openai_jokes))
     updater.start_polling()
     updater.idle()
 if __name__ == '__main__':
